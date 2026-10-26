@@ -1,0 +1,10 @@
+{
+  "name": "scenario-dsl",
+  "private": true,
+  "scripts": {
+    "test": "playwright test -c example"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

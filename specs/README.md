@@ -1,0 +1,125 @@
+# Specs
+
+A spec file is a list of scenarios. Each scenario is a title and some steps,
+written as tagged templates:
+
+```ts
+import { Scenario, Given, When, Then } from './steps';
+
+Scenario(`the service is up and shows its home page`,
+  Given`the service is running`,
+  When`I open the home page`,
+  Then`I see "Example service"`,
+);
+```
+
+That is the whole file. A spec file holds scenarios and nothing else: no
+selectors, no logic, no imports but that one. Spec files are numbered,
+`NNNN-slug.spec.ts`, one per slice of behaviour.
+
+## Steps
+
+A step's implementation is a plain function in `steps/`, registered by calling
+the step with it:
+
+```ts
+import { Given, When, Then, expect } from './dsl';
+
+When`I open the home page`(async ({ page }) => {
+  await page.goto('/');
+});
+
+Then`I see "Example service"`(async ({ page }, text) => {
+  await expect(page.getByRole('heading', { name: text })).toBeVisible();
+});
+```
+
+- Steps are keyed by their text. Quoted strings in the text are parameters, so
+  `` Then`I see "Example service"` `` and `` Then`I see "Sam"` `` share one
+  implementation, which receives the quoted values as strings after `{ page }`.
+- `And` continues the line before it: `Given … And …` is two Givens.
+  Implementations are registered under Given, When or Then, never And.
+- A step file must be imported from `steps/index.ts`, or nothing it registers
+  is seen.
+
+## Pending
+
+A scenario with a step that has no implementation, or with no steps at all, is
+reported as pending, not failed. The run stays green. With these two scenarios
+added to the example:
+
+```ts
+Scenario(`a signed-in user sees their name`,
+  Given`I am signed in as "Sam"`,
+  When`I open the home page`,
+  Then`I see "Sam"`,
+);
+
+Scenario(`a signed-out user is asked to sign in`);
+```
+
+the run prints:
+
+```
+  -  1 [desktop] › ../dsl.ts:79:10 › Scenario: a signed-in user sees their name
+  -  2 [desktop] › ../dsl.ts:79:10 › Scenario: a signed-out user is asked to sign in
+  -  3 [phone] › ../dsl.ts:79:10 › Scenario: a signed-in user sees their name
+  -  4 [phone] › ../dsl.ts:79:10 › Scenario: a signed-out user is asked to sign in
+  ✓  5 [desktop] › ../dsl.ts:82:7 › Scenario: the service is up and shows its home page (268ms)
+  ✓  6 [phone] › ../dsl.ts:82:7 › Scenario: the service is up and shows its home page (268ms)
+
+  4 skipped
+  2 passed (863ms)
+```
+
+Only the Given is missing from the first one: `I open the home page` already
+exists, and `` Then`I see "Sam"` `` reuses the implementation of
+`` Then`I see "…"` ``. The HTML report carries a `pending` annotation on each
+skipped scenario saying exactly that:
+
+```
+no implementation for: Given I am signed in as "…"
+no steps yet
+```
+
+## The flow
+
+After Kent Beck's Canon TDD: the whole list first, then one at a time.
+
+1. List the slice's scenarios as titles only, `` Scenario(`…`) `` with no steps.
+   They are pending.
+2. Fill in each one's Given / When / Then in words, with no code behind them.
+   Read the whole slice end to end to check it hangs together.
+3. Take one scenario at a time. Implement its steps in `steps/`; it goes live.
+   Run it. **It must fail.** If it passes, either the behaviour already exists
+   or the test is wrong; say which. Then make the smallest change that makes it
+   pass, and check no other scenario changed colour.
+
+Every spec runs twice, once in the `desktop` project and once in `phone`.
+
+## Layout
+
+```
+specs/
+  dsl.ts                   the DSL, shared by every service
+  package.json             the only one in the repo
+  <service>/
+    playwright.config.ts   starts the service; desktop and phone projects
+    NNNN-slug.spec.ts      numbered spec files, scenarios only
+    steps/
+      dsl.ts               one line: re-exports ../../dsl
+      index.ts             imports every step file, then re-exports the DSL
+      *.ts                 step implementations
+```
+
+## Quirks
+
+- The report labels every scenario `dsl.ts:<line>` rather than the spec file,
+  because `test()` is called inside the DSL. Read the scenario title.
+- Registering the same step text twice replaces the first, silently.
+- Parameters are always strings, and a quote inside one cannot be escaped.
+
+## Where it came from
+
+This folder was copied from the `scenario-dsl` repo. `dsl.ts` is the same file
+there; keep the two identical and carry improvements across by hand.
