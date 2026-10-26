@@ -102,6 +102,7 @@ Every spec runs twice, once in the `desktop` project and once in `phone`.
 ```
 specs/
   dsl.ts                   the DSL, shared by every service
+  playwright-internals.ts  the one file that reaches into Playwright; its comment says why
   package.json             the only one in the repo
   <service>/
     playwright.config.ts   starts the service; desktop and phone projects
@@ -115,14 +116,15 @@ specs/
 ## Quirks
 
 - A scenario is reported at the line of its `Scenario(` call and each step at
-  its own line, but only because the DSL reaches into three Playwright
-  internals, pinned at 1.63. If an upgrade moves them, the DSL falls back to
-  plain `test()` and `test.step()`, and everything is labelled `dsl.ts`
-  instead; the list output shows it at once.
+  its own line, but only because `playwright-internals.ts` reaches into three
+  Playwright internals, pinned at 1.63. If an upgrade moves them, it falls back
+  to plain `test()` and `test.step()`, and everything is labelled with the DSL's
+  own files instead; the list output shows it at once.
 - Registering the same step text twice replaces the first, silently.
 - Parameters are always strings, and a quote inside one cannot be escaped.
 
 ## Where it came from
 
-This folder was copied from the `scenario-dsl` repo. `dsl.ts` is the same file
-there; keep the two identical and carry improvements across by hand.
+This folder was copied from the `scenario-dsl` repo. `dsl.ts` and
+`playwright-internals.ts` are the same files there; keep them identical and
+carry improvements across by hand.

@@ -5,8 +5,10 @@ the step implementations kept apart from the spec files, and every scenario
 pending until each of its steps has an implementation. Every spec runs at a
 desktop and a phone viewport.
 
-The DSL is one file, `specs/dsl.ts`, with no dependency but `@playwright/test`.
-The pattern itself, with the rules and the flow for writing specs, is in
+The DSL is `specs/dsl.ts`, with no dependency but `@playwright/test`. Beside it,
+`specs/playwright-internals.ts` is the one file that reaches into Playwright, so
+that scenarios and steps are reported at their own lines in the spec files. The
+pattern itself, with the rules and the flow for writing specs, is in
 `specs/README.md`; that file travels with the folder.
 
 This repo is laid out like a repo that has already adopted it: the services
@@ -19,7 +21,7 @@ only inside `specs/`. Make yours look like this one.
 
        cd specs && npm install
 
-   `specs/` is the only place with a `package.json`. The shared file and every
+   `specs/` is the only place with a `package.json`. The shared files and every
    service's steps resolve the same copy of Playwright from it, and nothing
    Node-related touches the root.
 
@@ -57,5 +59,6 @@ scenario at a time.
 
 ## Where it came from
 
-The DSL was first written for Worry Map, where it is `specs/steps/dsl.ts`. The
-two copies are kept identical by hand; `diff` them when one changes.
+The DSL was first written for Worry Map, where `dsl.ts` and
+`playwright-internals.ts` live in `specs/steps/`. The two copies are kept
+identical by hand; `diff` them when one changes.
