@@ -1,5 +1,7 @@
 # scenario-dsl
 
+https://github.com/Commonwealth-Labs/scenario-dsl
+
 Specs written as scenarios: Given / When / Then lines on Playwright's runner, with
 the step implementations kept apart from the spec files, and every scenario
 pending until each of its steps has an implementation. Every spec runs at a
@@ -17,15 +19,34 @@ only inside `specs/`. Make yours look like this one.
 
 ## Adding it to a repo
 
-1. Copy `specs/` to the root of your repo and install once, inside it:
+1. Take the `specs/` folder, without cloning this repo, from the root of yours:
 
-       cd specs && npm install
+       curl -L https://github.com/Commonwealth-Labs/scenario-dsl/archive/refs/heads/main.tar.gz \
+         | tar -xz --strip-components=1 scenario-dsl-main/specs
+
+   That leaves `specs/` and nothing else, including a `.gitignore` for
+   `node_modules/` and the report folders. If the repo is private to your
+   organisation, download the archive from GitHub's Code menu instead and copy
+   `specs/` out of it.
+
+2. Install Playwright once, inside it:
+
+       cd specs && npm ci
+
+   That is the version this folder was tested with, from its lockfile. To use
+   your own, replace it, which rewrites `package.json` and the lockfile:
+
+       npm install -D @playwright/test@latest
+
+   The DSL works with any recent version. The part that reports scenarios and
+   steps at their own lines in the spec file checks for 1.63's internals and
+   falls back if they have moved; see Quirks in `specs/README.md`.
 
    `specs/` is the only place with a `package.json`. The shared files and every
    service's steps resolve the same copy of Playwright from it, and nothing
-   Node-related touches the root.
+   Node-related touches the root. Rename the package if you like.
 
-2. For each service, copy `specs/example/` to `specs/<service>/` and change two
+3. For each service, copy `specs/example/` to `specs/<service>/` and change two
    things:
 
    - in `playwright.config.ts`, the `port` and the `webServer.command` that
@@ -36,7 +57,7 @@ only inside `specs/`. Make yours look like this one.
 
    Then remove `specs/example/`. Nothing else refers to it.
 
-3. Run it from inside the service's folder:
+4. Run it from inside the service's folder:
 
        cd specs/<service> && npx playwright test
 
@@ -52,7 +73,8 @@ scenario at a time.
 
 ## Running the example here
 
-    cd specs
+    git clone https://github.com/Commonwealth-Labs/scenario-dsl
+    cd scenario-dsl/specs
     npm ci
     npx playwright install chromium
     npm test

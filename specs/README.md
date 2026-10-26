@@ -125,6 +125,6 @@ specs/
 
 ## Where it came from
 
-This folder was copied from the `scenario-dsl` repo. `dsl.ts` and
-`playwright-internals.ts` are the same files there; keep them identical and
-carry improvements across by hand.
+This folder was copied from https://github.com/Commonwealth-Labs/scenario-dsl.
+`dsl.ts` and `playwright-internals.ts` are the same files there; keep them
+identical and carry improvements across by hand.
