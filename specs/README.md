@@ -114,10 +114,11 @@ specs/
 
 ## Quirks
 
-- A scenario is reported at the line of its `Scenario(` call, but only because
-  the DSL reaches into three Playwright internals, pinned at 1.63. If an upgrade
-  moves them, the DSL falls back to plain `test()` and every scenario is labelled
-  `dsl.ts` instead; the list output shows it at once.
+- A scenario is reported at the line of its `Scenario(` call and each step at
+  its own line, but only because the DSL reaches into three Playwright
+  internals, pinned at 1.63. If an upgrade moves them, the DSL falls back to
+  plain `test()` and `test.step()`, and everything is labelled `dsl.ts`
+  instead; the list output shows it at once.
 - Registering the same step text twice replaces the first, silently.
 - Parameters are always strings, and a quote inside one cannot be escaped.
 
