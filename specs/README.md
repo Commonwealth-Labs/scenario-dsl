@@ -46,7 +46,7 @@ Then`I see "Example service"`(async ({ page }, text) => {
 
 A scenario with a step that has no implementation, or with no steps at all, is
 reported as pending, not failed. The run stays green. With these two scenarios
-added to the example:
+in a new file, `0001-signing-in.spec.ts`:
 
 ```ts
 Scenario(`a signed-in user sees their name`,
@@ -61,15 +61,15 @@ Scenario(`a signed-out user is asked to sign in`);
 the run prints:
 
 ```
-  -  1 [desktop] › ../dsl.ts:79:10 › Scenario: a signed-in user sees their name
-  -  2 [desktop] › ../dsl.ts:79:10 › Scenario: a signed-out user is asked to sign in
-  -  3 [phone] › ../dsl.ts:79:10 › Scenario: a signed-in user sees their name
-  -  4 [phone] › ../dsl.ts:79:10 › Scenario: a signed-out user is asked to sign in
-  ✓  5 [desktop] › ../dsl.ts:82:7 › Scenario: the service is up and shows its home page (268ms)
-  ✓  6 [phone] › ../dsl.ts:82:7 › Scenario: the service is up and shows its home page (268ms)
+  -  1 [desktop] › 0001-signing-in.spec.ts:3:9 › Scenario: a signed-in user sees their name
+  -  2 [desktop] › 0001-signing-in.spec.ts:9:9 › Scenario: a signed-out user is asked to sign in
+  -  3 [phone] › 0001-signing-in.spec.ts:3:9 › Scenario: a signed-in user sees their name
+  -  4 [phone] › 0001-signing-in.spec.ts:9:9 › Scenario: a signed-out user is asked to sign in
+  ✓  5 [phone] › 0000-walking-skeleton.spec.ts:3:9 › Scenario: the service is up and shows its home page (82ms)
+  ✓  6 [desktop] › 0000-walking-skeleton.spec.ts:3:9 › Scenario: the service is up and shows its home page (82ms)
 
   4 skipped
-  2 passed (863ms)
+  2 passed (458ms)
 ```
 
 Only the Given is missing from the first one: `I open the home page` already
@@ -114,8 +114,10 @@ specs/
 
 ## Quirks
 
-- The report labels every scenario `dsl.ts:<line>` rather than the spec file,
-  because `test()` is called inside the DSL. Read the scenario title.
+- A scenario is reported at the line of its `Scenario(` call, but only because
+  the DSL reaches into three Playwright internals, pinned at 1.63. If an upgrade
+  moves them, the DSL falls back to plain `test()` and every scenario is labelled
+  `dsl.ts` instead; the list output shows it at once.
 - Registering the same step text twice replaces the first, silently.
 - Parameters are always strings, and a quote inside one cannot be escaped.
 
