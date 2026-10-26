@@ -24,7 +24,15 @@ only inside `specs/`. Make yours look like this one.
        curl -L https://github.com/Commonwealth-Labs/scenario-dsl/archive/refs/heads/main.tar.gz \
          | tar -xz --strip-components=1 scenario-dsl-main/specs
 
-   That leaves `specs/` and nothing else, including a `.gitignore` for
+   On Windows, `curl.exe` and `tar.exe` are built in, but a pipe between them
+   is not binary-safe in every shell, so download first. This works in cmd and
+   in PowerShell:
+
+       curl.exe -L https://github.com/Commonwealth-Labs/scenario-dsl/archive/refs/heads/main.tar.gz -o scenario-dsl.tar.gz
+       tar -xzf scenario-dsl.tar.gz --strip-components=1 scenario-dsl-main/specs
+       del scenario-dsl.tar.gz
+
+   Either way, that leaves `specs/` and nothing else, including a `.gitignore` for
    `node_modules/` and the report folders. If the repo is private to your
    organisation, download the archive from GitHub's Code menu instead and copy
    `specs/` out of it.
