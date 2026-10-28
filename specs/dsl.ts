@@ -83,7 +83,7 @@ export const Scenario = (title: string, ...given: Step[]) => {
   const steps = resolveAnds(given);
   const missing = steps.filter((step) => !implementations.has(step.key));
   if (steps.length === 0 || missing.length > 0) {
-    const why = steps.length === 0 ? 'no steps yet' : `no implementation for: ${missing.map((step) => step.key).join('; ')}`;
+    const why = steps.length === 0 ? 'no steps yet' : `no implementation for:\n - ${missing.map((step) => step.key).join('\n - ')}`;
     declareTest('fixme', at, name, { annotation: { type: 'pending', description: why } }, async () => {});
     return;
   }
