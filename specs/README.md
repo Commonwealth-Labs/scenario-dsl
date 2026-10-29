@@ -32,11 +32,16 @@ When`I open the home page`(async ({ page }) => {
 Then`I see "Example service"`(async ({ page }, text) => {
   await expect(page.getByRole('heading', { name: text })).toBeVisible();
 });
+
+Given`I am signed in as "…"`();
 ```
 
 - Steps are keyed by their text. Quoted strings in the text are parameters, so
   `` Then`I see "Example service"` `` and `` Then`I see "Sam"` `` share one
   implementation, which receives the quoted values as strings after `{ page }`.
+- A step called with no function is a stub. It counts as implemented, so its
+  scenarios go live, and it fails with `Not yet implemented: Given I am signed
+  in as "…"` until it is written.
 - `And` continues the line before it: `Given … And …` is two Givens.
   Implementations are registered under Given, When or Then, never And.
 - A step file must be imported from `steps/index.ts`, or nothing it registers
@@ -45,8 +50,9 @@ Then`I see "Example service"`(async ({ page }, text) => {
 ## Pending
 
 A scenario with a step that has no implementation, or with no steps at all, is
-reported as pending, not failed. The run stays green. With these two scenarios
-in a new file, `0001-signing-in.spec.ts`:
+reported as pending, not failed. The run stays green. A stub counts as an
+implementation, so stubbing the missing steps turns a pending scenario red
+instead. With these two scenarios in a new file, `0001-signing-in.spec.ts`:
 
 ```ts
 Scenario(`a signed-in user sees their name`,
@@ -91,9 +97,11 @@ After Kent Beck's Canon TDD: the whole list first, then one at a time.
 2. Fill in each one's Given / When / Then in words, with no code behind them.
    Read the whole slice end to end to check it hangs together.
 3. Take one scenario at a time. Implement its steps in `steps/`; it goes live.
-   Run it. **It must fail.** If it passes, either the behaviour already exists
-   or the test is wrong; say which. Then make the smallest change that makes it
-   pass, and check no other scenario changed colour.
+   To make it red before any of them is written, stub them first,
+   `` Given`…`() ``: it fails at the first stub. Run it. **It must fail.** If
+   it passes, either the behaviour already exists or the test is wrong; say
+   which. Then make the smallest change that makes it pass, and check no other
+   scenario changed colour.
 
 Every spec runs twice, once in the `desktop` project and once in `phone`.
 

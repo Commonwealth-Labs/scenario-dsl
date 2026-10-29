@@ -17,6 +17,11 @@ import { callerLocation, declareTest, type Location } from './playwright-interna
 //
 //   Given`the map is empty`(async ({ page }) => { … });
 //
+// A step called with no function is a stub. It counts as implemented, so its
+// scenarios go live, and it fails with "Not yet implemented" until it is written:
+//
+//   Given`I am signed in as "…"`();
+//
 // And continues the line before it, so Given … And … is two Givens. Its
 // implementation is registered under Given, When or Then, never And.
 //
@@ -31,7 +36,7 @@ type Context = { page: Page };
 type Implementation = (context: Context, ...args: string[]) => Promise<void>;
 type Keyword = 'Given' | 'When' | 'Then';
 type Step = { keyword: Keyword | 'And'; text: string; key: string; args: string[]; location?: Location };
-type StepTag = Step & ((implementation: Implementation) => void);
+type StepTag = Step & ((implementation?: Implementation) => void);
 
 const implementations = new Map<string, Implementation>();
 
@@ -52,7 +57,13 @@ const keyword = (word: Keyword | 'And') => {
     const text = join(strings, values);
     const { key, args } = parse(text);
     const fullKey = `${word} ${key}`;
-    const register = (implementation: Implementation) => {
+    // A stub's failure is reported at the step's line in the spec, so the error
+    // carries no stack: a code frame would only show this throw in dsl.ts.
+    const notYetImplemented: Implementation = async () => {
+      const message = `Not yet implemented: ${fullKey}`;
+      throw Object.assign(new Error(message), { stack: `Error: ${message}` });
+    };
+    const register = (implementation: Implementation = notYetImplemented) => {
       implementations.set(fullKey, implementation);
     };
     return Object.assign(register, { keyword: word, text, key: fullKey, args, location: callerLocation(tag) });
