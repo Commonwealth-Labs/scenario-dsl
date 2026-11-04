@@ -111,6 +111,7 @@ Every spec runs twice, once in the `desktop` project and once in `phone`.
 specs/
   dsl.ts                   the DSL, shared by every service
   playwright-internals.ts  the one file that reaches into Playwright; its comment says why
+  fixtures.ts              decorates Playwright's test with what steps receive besides the page
   package.json             the only one in the repo
   <service>/
     playwright.config.ts   starts the service; desktop and phone projects

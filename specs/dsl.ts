@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test, type Context } from './fixtures';
 import { callerLocation, declareTest, type Location } from './playwright-internals';
 
 // A spec file is a list of scenarios. Each line of a scenario is a step: a
@@ -32,7 +33,6 @@ import { callerLocation, declareTest, type Location } from './playwright-interna
 // file. playwright-internals.ts is how, and is the only file that reaches into
 // Playwright to do it.
 
-type Context = { page: Page };
 type Implementation = (context: Context, ...args: string[]) => Promise<void>;
 type Keyword = 'Given' | 'When' | 'Then';
 type Step = { keyword: Keyword | 'And'; text: string; key: string; args: string[]; location?: Location };
@@ -98,10 +98,10 @@ export const Scenario = (title: string, ...given: Step[]) => {
     declareTest('fixme', at, name, { annotation: { type: 'pending', description: why } }, async () => {});
     return;
   }
-  declareTest('default', at, name, {}, async ({ page }) => {
+  declareTest('default', at, name, {}, async ({ stepContext }) => {
     for (const step of steps) {
       await test.step(`${step.keyword} ${step.text}`, () =>
-        implementations.get(step.key)!({ page }, ...step.args), { location: step.location });
+        implementations.get(step.key)!(stepContext, ...step.args), { location: step.location });
     }
   });
 };

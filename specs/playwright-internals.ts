@@ -1,4 +1,5 @@
-import { test, type Page, type TestDetails } from '@playwright/test';
+import { type TestDetails } from '@playwright/test';
+import { test } from './fixtures';
 
 // The only file that reaches into Playwright.
 //
@@ -55,7 +56,7 @@ export const callerLocation = (above: Function): Location | undefined => {
   return { file, line: frame.getLineNumber() ?? 0, column: frame.getColumnNumber() ?? 0 };
 };
 
-type Body = (context: { page: Page }) => Promise<void>;
+type Body = (fixtures: any) => Promise<void>;
 
 // Declares a test at the given location; without the internals, at the line
 // below that calls test(), which is the old behaviour.
