@@ -11,17 +11,19 @@ import { callerLocation, declareTest, type Location } from './playwright-interna
 //     Then`"file the accounts" is on the map`,
 //   );
 //
-// Quoted strings in the text are parameters, so 'I capture "file the accounts"'
-// and 'I capture "fix the gutter"' share one implementation, keyed
-// 'When I capture "…"'. Implementations are plain functions registered from
-// specs/steps/*.ts by calling the step with a function:
+// Quoted strings and whole numbers in the text are parameters, keyed as Cucumber
+// writes them: 'I capture "file the accounts"' and 'I capture "fix the gutter"'
+// share 'When I capture {string}', and 'I see 0 obligations' and 'I see 3
+// obligations' share 'Then I see {int} obligations'. Unlike Cucumber, every
+// parameter arrives as a string. Implementations are plain functions registered
+// from specs/steps/*.ts by calling the step with a function:
 //
 //   Given`the map is empty`(async ({ page }) => { … });
 //
 // A step called with no function is a stub. It counts as implemented, so its
 // scenarios go live, and it fails with "Not yet implemented" until it is written:
 //
-//   Given`I am signed in as "…"`();
+//   Given`I am signed in as {string}`();
 //
 // And continues the line before it, so Given … And … is two Givens. Its
 // implementation is registered under Given, When or Then, never And.
@@ -45,9 +47,9 @@ const join = (strings: TemplateStringsArray, values: unknown[]) =>
 
 const parse = (text: string) => {
   const args: string[] = [];
-  const key = text.replace(/"([^"]*)"/g, (_, value) => {
-    args.push(value);
-    return '"…"';
+  const key = text.replace(/"([^"]*)"|\b(\d+)\b/g, (_, quoted, number) => {
+    args.push(quoted ?? number);
+    return quoted === undefined ? '{int}' : '{string}';
   });
   return { key, args };
 };

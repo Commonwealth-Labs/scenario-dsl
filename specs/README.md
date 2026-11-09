@@ -29,19 +29,22 @@ When`I open the home page`(async ({ page }) => {
   await page.goto('/');
 });
 
-Then`I see "Example service"`(async ({ page }, text) => {
+Then`I see {string}`(async ({ page }, text) => {
   await expect(page.getByRole('heading', { name: text })).toBeVisible();
 });
 
-Given`I am signed in as "…"`();
+Given`I am signed in as {string}`();
 ```
 
-- Steps are keyed by their text. Quoted strings in the text are parameters, so
-  `` Then`I see "Example service"` `` and `` Then`I see "Sam"` `` share one
-  implementation, which receives the quoted values as strings after `{ page }`.
+- Steps are keyed by their text, with parameters written as Cucumber writes
+  them: quoted strings are `{string}` and whole numbers are `{int}`. So
+  `` Then`I see "Example service"` `` and `` Then`I see "Sam"` `` share
+  `` Then`I see {string}` ``, and `` Then`I see 3 items` `` is
+  `` Then`I see {int} items` ``. The implementation receives the values as
+  strings after `{ page }`.
 - A step called with no function is a stub. It counts as implemented, so its
   scenarios go live, and it fails with `Not yet implemented: Given I am signed
-  in as "…"` until it is written.
+  in as {string}` until it is written.
 - `And` continues the line before it: `Given … And …` is two Givens.
   Implementations are registered under Given, When or Then, never And.
 - A step file must be imported from `steps/index.ts`, or nothing it registers
@@ -80,11 +83,11 @@ the run prints:
 
 Only the Given is missing from the first one: `I open the home page` already
 exists, and `` Then`I see "Sam"` `` reuses the implementation of
-`` Then`I see "…"` ``. The HTML report carries a `pending` annotation on each
+`` Then`I see {string}` ``. The HTML report carries a `pending` annotation on each
 skipped scenario saying exactly that:
 
 ```
-no implementation for: Given I am signed in as "…"
+no implementation for: Given I am signed in as {string}
 no steps yet
 ```
 
@@ -130,7 +133,9 @@ specs/
   to plain `test()` and `test.step()`, and everything is labelled with the DSL's
   own files instead; the list output shows it at once.
 - Registering the same step text twice replaces the first, silently.
-- Parameters are always strings, and a quote inside one cannot be escaped.
+- Parameters are always strings, `{int}` included, and a quote inside one
+  cannot be escaped. There is no `{float}`, `{word}` or custom type: `1.5` is
+  read as two `{int}`s.
 
 ## Where it came from
 

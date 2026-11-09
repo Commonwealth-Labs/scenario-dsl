@@ -9,6 +9,6 @@ When`I open the home page`(async ({ page }) => {
   await page.goto('/');
 });
 
-Then`I see "Example service"`(async ({ page }, text) => {
+Then`I see {string}`(async ({ page }, text) => {
   await expect(page.getByRole('heading', { name: text })).toBeVisible();
 });
