@@ -33,6 +33,10 @@ Then`I see {string}`(async ({ page }, text) => {
   await expect(page.getByRole('heading', { name: text })).toBeVisible();
 });
 
+Then`I see {int} items`(async ({ page }, count: number) => {
+  await expect(page.getByRole('listitem')).toHaveCount(count);
+});
+
 Given`I am signed in as {string}`();
 ```
 
@@ -41,7 +45,9 @@ Given`I am signed in as {string}`();
   `` Then`I see "Example service"` `` and `` Then`I see "Sam"` `` share
   `` Then`I see {string}` ``, and `` Then`I see 3 items` `` is
   `` Then`I see {int} items` ``. The implementation receives the values after
-  `{ page }`, a `{string}` as a string and an `{int}` as a number.
+  `{ page }`, a `{string}` as a string and an `{int}` as a number. Annotate
+  each parameter, as with `count: number` above, or TypeScript sees it as
+  `any` and won't catch `count === "0"`.
 - A step called with no function is a stub. It counts as implemented, so its
   scenarios go live, and it fails with `Not yet implemented: Given I am signed
   in as {string}` until it is written.
