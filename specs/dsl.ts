@@ -14,9 +14,9 @@ import { callerLocation, declareTest, type Location } from './playwright-interna
 // Quoted strings and whole numbers in the text are parameters, keyed as Cucumber
 // writes them: 'I capture "file the accounts"' and 'I capture "fix the gutter"'
 // share 'When I capture {string}', and 'I see 0 obligations' and 'I see 3
-// obligations' share 'Then I see {int} obligations'. Unlike Cucumber, every
-// parameter arrives as a string. Implementations are plain functions registered
-// from specs/steps/*.ts by calling the step with a function:
+// obligations' share 'Then I see {int} obligations'. As in Cucumber, a {string}
+// arrives as a string and an {int} as a number. Implementations are plain
+// functions registered from specs/steps/*.ts by calling the step with a function:
 //
 //   Given`the map is empty`(async ({ page }) => { … });
 //
@@ -35,9 +35,10 @@ import { callerLocation, declareTest, type Location } from './playwright-interna
 // file. playwright-internals.ts is how, and is the only file that reaches into
 // Playwright to do it.
 
-type Implementation = (context: Context, ...args: string[]) => Promise<void>;
+type Arg = string | number;
+type Implementation = (context: Context, ...args: any[]) => Promise<void>;
 type Keyword = 'Given' | 'When' | 'Then';
-type Step = { keyword: Keyword | 'And'; text: string; key: string; args: string[]; location?: Location };
+type Step = { keyword: Keyword | 'And'; text: string; key: string; args: Arg[]; location?: Location };
 type StepTag = Step & ((implementation?: Implementation) => void);
 
 const implementations = new Map<string, Implementation>();
@@ -46,9 +47,9 @@ const join = (strings: TemplateStringsArray, values: unknown[]) =>
   strings.reduce((text, part, i) => text + part + (i < values.length ? String(values[i]) : ''), '');
 
 const parse = (text: string) => {
-  const args: string[] = [];
+  const args: Arg[] = [];
   const key = text.replace(/"([^"]*)"|\b(\d+)\b/g, (_, quoted, number) => {
-    args.push(quoted ?? number);
+    args.push(quoted ?? Number(number));
     return quoted === undefined ? '{int}' : '{string}';
   });
   return { key, args };

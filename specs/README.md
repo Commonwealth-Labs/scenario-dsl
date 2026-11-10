@@ -40,8 +40,8 @@ Given`I am signed in as {string}`();
   them: quoted strings are `{string}` and whole numbers are `{int}`. So
   `` Then`I see "Example service"` `` and `` Then`I see "Sam"` `` share
   `` Then`I see {string}` ``, and `` Then`I see 3 items` `` is
-  `` Then`I see {int} items` ``. The implementation receives the values as
-  strings after `{ page }`.
+  `` Then`I see {int} items` ``. The implementation receives the values after
+  `{ page }`, a `{string}` as a string and an `{int}` as a number.
 - A step called with no function is a stub. It counts as implemented, so its
   scenarios go live, and it fails with `Not yet implemented: Given I am signed
   in as {string}` until it is written.
@@ -133,8 +133,7 @@ specs/
   to plain `test()` and `test.step()`, and everything is labelled with the DSL's
   own files instead; the list output shows it at once.
 - Registering the same step text twice replaces the first, silently.
-- Parameters are always strings, `{int}` included, and a quote inside one
-  cannot be escaped. There is no `{float}`, `{word}` or custom type: `1.5` is
+- A quote inside a `{string}` cannot be escaped. There is no `{float}`, `{word}` or custom type: `1.5` is
   read as two `{int}`s.
 
 ## Where it came from
